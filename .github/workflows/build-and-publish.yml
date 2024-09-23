@@ -26,16 +26,17 @@ jobs:
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
 
-      - name: Generate version based on current time
+      - name: Calculate new version
         id: version
         run: |
-          TIMESTAMP=$(date +%s%N | cut -b1-13) # Current time in milliseconds
-          SHORT_VERSION=${TIMESTAMP: -5} # Trim to the last 5 digits
-          echo "VERSION=1.0.$SHORT_VERSION" >> $GITHUB_OUTPUT
+          LAST_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          NEW_VERSION=$(echo $LAST_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "NEW_VERSION=$NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update POM version
         run: |
-          mvn versions:set -DnewVersion=${{ steps.version.outputs.VERSION }}
+          mvn versions:set -DnewVersion=${{ steps.version.outputs.NEW_VERSION }}
           mvn versions:commit
 
       - name: Build with Maven
@@ -43,5 +44,10 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: mvn deploy
+
+      - name: Create and Push Tag
+        run: |
+          git tag ${{ steps.version.outputs.NEW_VERSION }}
+          git push origin ${{ steps.version.outputs.NEW_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
