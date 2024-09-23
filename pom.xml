@@ -50,4 +50,10 @@
             <url>https://maven.pkg.github.com/fakruboss/fakru-commons</url>
         </repository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/fakruboss/fakru-commons</url>
+        </repository>
+    </repositories>
 </project>
