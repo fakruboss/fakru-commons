@@ -29,10 +29,19 @@ jobs:
       - name: Calculate new version
         id: version
         run: |
-          LAST_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.0.0")
+          LAST_VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "1.2.0")
           NEW_VERSION=$(echo $LAST_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           echo "NEW_VERSION=$NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          # Check if the tag already exists
+          TAG_EXISTS=$(git tag -l "$NEW_VERSION")
+          if [ ! -z "$TAG_EXISTS" ]; then
+            # Increment again if the version already exists
+            NEW_VERSION=$(echo $NEW_VERSION | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+            echo "Incremented to NEW_VERSION=$NEW_VERSION"
+          fi
+          echo "FINAL_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Update POM version
         run: |
