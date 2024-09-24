@@ -1,5 +1,8 @@
 package util;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class StringUtils {
 
     public boolean isNullOrEmpty(String s) {
