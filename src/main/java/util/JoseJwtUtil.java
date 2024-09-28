@@ -25,7 +25,7 @@ public class JoseJwtUtil {
     }
 
     /**
-     * Expiry time is 5 minutes (1000ms * 60sec * 5)
+     * Expiry time is 5 minutes (1000ms * 60sec * 15)
      *
      * @param subject uniquely identify the user from this. it's userId from user table here
      * @param claims  additional information
@@ -34,7 +34,7 @@ public class JoseJwtUtil {
     public String generateToken(String subject, Map<String, Object> claims) throws JOSEException {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(subject)
-                .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
+                .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
                 .claim(CLAIMS, claims)
                 .build();
 
