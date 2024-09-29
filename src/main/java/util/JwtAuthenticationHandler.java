@@ -1,24 +1,24 @@
 package util;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class JwtAuthenticationHandler {
 
-    private final Function<String, String> headerExtractor;
+    private final UnaryOperator<String> headerExtractor;
     private final Function<Map<String, Object>, Void> errorHandler;
 
     public JwtAuthenticationHandler(
-            Function<String, String> headerExtractor,
+            UnaryOperator<String> headerExtractor,
             Function<Map<String, Object>, Void> errorHandler) {
         this.headerExtractor = headerExtractor;
         this.errorHandler = errorHandler;
     }
 
-    public JWTClaimsSet authenticate(Map<String, Object> request) {
+    public JWTClaimsSet authenticate() {
         String bearerToken = headerExtractor.apply("Authorization");
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
             errorHandler.apply(Map.of(
@@ -37,12 +37,5 @@ public class JwtAuthenticationHandler {
             ));
             return null;
         }
-    }
-
-    public String refreshToken(JWTClaimsSet claimsSet) throws JOSEException {
-        if (claimsSet == null) return null;
-        String subject = claimsSet.getSubject();
-        Map<String, Object> claims = (Map<String, Object>) claimsSet.getClaim("claims");
-        return JoseJwtUtil.generateToken(subject, claims);
     }
 }
