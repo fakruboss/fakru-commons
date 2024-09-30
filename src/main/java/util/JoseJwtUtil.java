@@ -25,18 +25,15 @@ public class JoseJwtUtil {
         return generateSafeToken(subject, new HashMap<>());
     }
 
-    /**
-     * Expiry time is 5 minutes (1000ms * 60sec * 15)
-     *
-     * @param subject uniquely identify the user from this. it's userId from user table here
-     * @param claims  additional information
-     * @return the bearer token
-     */
     public String generateSafeToken(String subject, Map<String, Object> claims) {
+        return generateSafeTokenWithExpiryTime(subject, claims, 15);
+    }
+
+    public String generateSafeTokenWithExpiryTime(String subject, Map<String, Object> claims, long expiryInMinutes) {
         try {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(subject)
-                    .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                    .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * expiryInMinutes))
                     .claim(CLAIMS, claims)
                     .build();
 
