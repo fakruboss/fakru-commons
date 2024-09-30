@@ -7,6 +7,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import exception.JwtGenerationException;
 import lombok.experimental.UtilityClass;
 
 import javax.naming.AuthenticationException;
@@ -20,8 +21,8 @@ public class JoseJwtUtil {
     private static final String SECRET = "88cf3e49-e28e-4c0e-b95f-6a68a785a89d";
     public static final String CLAIMS = "claims";
 
-    public String generateToken(String subject) throws JOSEException {
-        return generateToken(subject, new HashMap<>());
+    public String generateSafeToken(String subject) {
+        return generateSafeToken(subject, new HashMap<>());
     }
 
     /**
@@ -31,17 +32,21 @@ public class JoseJwtUtil {
      * @param claims  additional information
      * @return the bearer token
      */
-    public String generateToken(String subject, Map<String, Object> claims) throws JOSEException {
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                .subject(subject)
-                .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
-                .claim(CLAIMS, claims)
-                .build();
+    public String generateSafeToken(String subject, Map<String, Object> claims) {
+        try {
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                    .subject(subject)
+                    .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                    .claim(CLAIMS, claims)
+                    .build();
 
-        JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.HS256).build();
-        SignedJWT signedJWT = new SignedJWT(jwsHeader, claimsSet);
-        signedJWT.sign(new MACSigner(SECRET.getBytes()));
-        return signedJWT.serialize();
+            JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.HS256).build();
+            SignedJWT signedJWT = new SignedJWT(jwsHeader, claimsSet);
+            signedJWT.sign(new MACSigner(SECRET.getBytes()));
+            return signedJWT.serialize();
+        } catch (JOSEException e) {
+            throw new JwtGenerationException("Failed to generate JWT token for subject: " + subject, e);
+        }
     }
 
     public JWTClaimsSet extractClaims(String bearerToken) throws ParseException, JOSEException, AuthenticationException {
