@@ -29,7 +29,7 @@ public class JwtAuthenticationHandler {
         }
 
         try {
-            return JoseJwtUtil.extractClaims(bearerToken);
+            return JoseJwtUtil.extractClaimsSet(bearerToken);
         } catch (Exception e) {
             errorHandler.apply(Map.of(
                     "status", 401,

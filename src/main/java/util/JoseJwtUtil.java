@@ -19,7 +19,7 @@ import java.util.Map;
 @UtilityClass
 public class JoseJwtUtil {
     private static final String SECRET = "88cf3e49-e28e-4c0e-b95f-6a68a785a89d";
-    public static final String CLAIMS = "claims";
+    public static final String ITEMS = "items";
 
     public String generateSafeToken(String subject) {
         return generateSafeToken(subject, new HashMap<>());
@@ -29,12 +29,12 @@ public class JoseJwtUtil {
         return generateSafeTokenWithExpiryTime(subject, claims, 15);
     }
 
-    public String generateSafeTokenWithExpiryTime(String subject, Map<String, Object> claims, long expiryInMinutes) {
+    public String generateSafeTokenWithExpiryTime(String subject, Map<String, Object> items, long expiryInMinutes) {
         try {
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                     .subject(subject)
                     .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * expiryInMinutes))
-                    .claim(CLAIMS, claims)
+                    .claim(ITEMS, items)
                     .build();
 
             JWSHeader jwsHeader = new JWSHeader.Builder(JWSAlgorithm.HS256).build();
@@ -46,7 +46,7 @@ public class JoseJwtUtil {
         }
     }
 
-    public JWTClaimsSet extractClaims(String bearerToken) throws ParseException, JOSEException, AuthenticationException {
+    public JWTClaimsSet extractClaimsSet(String bearerToken) throws ParseException, JOSEException, AuthenticationException {
         String token = null;
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             token = bearerToken.substring(7);
