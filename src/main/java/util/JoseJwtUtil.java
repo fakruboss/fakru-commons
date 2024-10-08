@@ -26,7 +26,7 @@ public class JoseJwtUtil {
     }
 
     public String generateSafeToken(String subject, Map<String, Object> claims) {
-        return generateSafeTokenWithExpiryTime(subject, claims, 15);
+        return generateSafeTokenWithExpiryTime(subject, claims, 60);
     }
 
     public String generateSafeTokenWithExpiryTime(String subject, Map<String, Object> items, long expiryInMinutes) {
